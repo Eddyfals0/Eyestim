@@ -1,31 +1,14 @@
-# Ignorar archivos de caché de Python
+# Cache de Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Ignorar entornos virtuales
-venv/
-.venv/
-env/
-ENV/
-*.env
-
-# Ignorar los datos (imágenes reales, datasets pesados)
-# Si deseas subir alguna imagen de prueba, puedes forzarlo con git add -f
-data/
-../data/
-
-# Ignorar los modelos entrenados (los archivos .pth suelen pesar mucho)
-models/*.pth
-
-# Ignorar las imágenes de resultados temporales generadas por matplotlib
-results/*.png
-*.png
-*.jpg
-*.jpeg
-
 # Entornos de desarrollo
 .vscode/
 .idea/
 .ipynb_checkpoints/
+
+# Windows
+desktop.ini
+Thumbs.db

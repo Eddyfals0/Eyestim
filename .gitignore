@@ -11,17 +11,6 @@ env/
 ENV/
 *.env
 
-# Datos e imagenes pesadas
-data/
-capturas/
-
-# Modelos entrenados (archivos pesados .pth)
-models/*.pth
-*.pth
-
-# Imagenes de resultados temporales
-results/*.png
-
 # Entornos de desarrollo
 .vscode/
 .idea/
