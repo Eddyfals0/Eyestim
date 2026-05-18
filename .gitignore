@@ -1,0 +1,32 @@
+# Cache de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Entornos virtuales
+venv/
+.venv/
+env/
+ENV/
+*.env
+
+# Datos e imagenes pesadas
+data/
+capturas/
+
+# Modelos entrenados (archivos pesados .pth)
+models/*.pth
+*.pth
+
+# Imagenes de resultados temporales
+results/*.png
+
+# Entornos de desarrollo
+.vscode/
+.idea/
+.ipynb_checkpoints/
+
+# Windows
+desktop.ini
+Thumbs.db
