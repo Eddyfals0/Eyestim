@@ -1,135 +1,122 @@
-# 👁️ Eyestim — Detector de Ojos e Iris con Inteligencia Artificial
+# 👁️ EyeStim — Visual Attention Analyzer (Deep-Classic Hybrid)
 
-Sistema de visión por computadora que **detecta ojos**, **clasifica si una imagen contiene un ojo** y **localiza el centro exacto del iris/pupila**, combinando Redes Neuronales Convolucionales (CNN) con algoritmos clásicos de procesamiento de imágenes.
+This repository contains the **Real-Time Pupilometry and Attention Tracking Module (EyeStim)**. Its purpose is to capture, model, and record the user's visual behavior in a non-invasive manner through a hybrid pipeline: deep gaze estimation by convolutional neural networks (CNN) and classical local pupillometric measurement using OpenCV.
 
-Incluye un módulo de **detección en tiempo real** que abre la cámara de la computadora y analiza los ojos del sujeto en vivo.
+The project is designed under strict principles of modularity and efficiency to run in real-time on a conventional CPU using low-cost webcams.
 
 ---
 
-## 🏗️ Estructura del Repositorio
+## 🏗️ Repository Structure
 
-```
+The project architecture is organized in a modular structure:
+
+```text
 Eyestim/
 │
-├── reconocimiento_ojos/          # Módulo 1: Entrenamiento y Clasificación
-│   ├── src/                      # Código fuente (CNN, entrenamiento, predicción)
-│   ├── docs/                     # Documentación técnica detallada
-│   ├── data/                     # Imágenes de entrenamiento (no incluidas en el repo)
-│   ├── models/                   # Modelos entrenados .pth (no incluidos en el repo)
-│   └── README.md                 # Documentación del módulo
+├── data/                    # Local Dataset (train/val/testing) - [Git Ignored]
+├── docs/                    # Scientific documentation and session reports
+│   ├── paper_eyestim.pdf    # Academic paper of the project in two-columns (PDF)
+│   ├── paper_eyestim.tex    # LaTeX source code of the academic paper
+│   ├── cnn_architecture.md  # Mermaid representation of the CNN architecture
+│   ├── session_report.md    # Statistical report of the last session
+│   └── attention_evolution.png # Temporal chart of attention and pupil diameter
 │
-├── reconocimiento_ojos_testing/  # Módulo 2: Detección en Tiempo Real (Cámara)
-│   ├── src/                      # Script de cámara en vivo
-│   └── README.md                 # Documentación del módulo
+├── models/                  # Weights and trained models (.pth) - [Git Ignored]
 │
-└── README.md                     # Este archivo
+├── src/                     # Unified source code
+│   ├── config.py            # System constants and configuration thresholds
+│   ├── utils.py             # Helper routines and OpenCV validation check
+│   ├── dataset.py           # PyTorch dataset loader and preprocessor for BioID
+│   ├── model.py             # Lightweight CNN architecture (EyePupilCNN)
+│   ├── train.py             # CNN training and convergence script
+│   ├── predict.py           # Static inference and visual comparison (CNN)
+│   ├── pupilometry.py       # Classical local processing of pupil diameter
+│   ├── attention.py         # Spatial mapper and cognitive attention estimator
+│   ├── reporter.py          # Statistical reporter generator in Markdown and PNG charts
+│   └── show_eyes.py         # Real-time HUD interactive viewer using webcam
+│
+├── requirements.txt         # Project dependencies
+└── .gitignore               # Git exclusions
 ```
 
 ---
 
-## ⚙️ ¿Cómo Funciona?
+## ⚙️ Hybrid Vision and Attention Pipeline
 
-El proyecto trabaja en **dos fases** que se complementan:
+The system integrates a processing flow across four parallel phases:
+1. **Facial and Eye Detection**: Uses fast Haar Cascades classifiers to delimit the eye region and crop the eye ROI into a $64 \times 64$ pixels window.
+2. **Deep Iris Localization (CNN)**: The lightweight convolutional network `EyePupilCNN` performs Cartesian regression on the ROI to locate the exact geometric center of the iris.
+3. **Classical Precision Pupilometry**: Extracts a local crop centered on the CNN estimation, applying local adaptive thresholding and least-squares ellipse fitting (`cv2.fitEllipse`) to estimate the physical pupil diameter in pixels.
+4. **Tracking and Attention Score**: Logs diameter fluctuations relative to an initially calibrated baseline, evaluating spatial gaze stability over 5 screen quadrants (Center, Up, Down, Left, Right) to compute a cognitive attention score (0%-100%).
 
-### Fase 1 — Clasificación con Red Neuronal CNN
-Una Red Neuronal Convolucional entrenada desde cero con PyTorch determina si una imagen contiene un ojo o no.
+---
 
-```
-Imagen de entrada (cualquier tamaño, color o B/N)
-    ↓
-Conversión a Escala de Grises (1 canal) + Resize 64x64
-    ↓
-3 Capas Convolucionales (Conv2D → ReLU → MaxPool)
-    ↓
-Capas Lineales + Dropout (50%)
-    ↓
-1 Neurona → Sigmoid → Probabilidad (0.0 a 1.0)
-    ↓
-¿Es un ojo? (prob < 0.5 = SÍ)
-```
+## 🚀 Installation and Setup
 
-### Fase 2 — Localización del Iris (Visión Clásica)
-Un algoritmo matemático eficiente ubica el centro exacto de la pupila sin necesidad de otra red neuronal.
+### 1. Clone the repository and set up the environment
+Setting up a local virtual environment is highly recommended:
+```bash
+# Create virtual environment
+python -m venv .venv
 
-```
-Imagen del ojo → Escala de grises
-    ↓
-Gaussian Blur dinámico (kernel = 10% del tamaño de la imagen)
-    ↓
-Recorte central (ignora 15% de los bordes → evita pelo, cejas, marcos)
-    ↓
-Búsqueda del píxel más oscuro → Centro del iris (x, y)
+# Activate virtual environment
+# On Windows (PowerShell):
+.venv\Scripts\Activate.ps1
+# On Linux/macOS:
+source .venv/bin/activate
 ```
 
-### Fase 3 — Cámara en Tiempo Real (OpenCV)
-Combina Haar Cascades + CNN + Gaussian Blur para analizar video en vivo:
-
-```
-Cámara → Haar Cascade (cara) → Haar Cascade (ojos) → CNN (confirma) → Iris (localiza)
+### 2. Install dependencies
+Install the required packages:
+```bash
+pip install -r requirements.txt
 ```
 
 ---
 
-## 🚀 Inicio Rápido
+## 🧪 Validation and Unit Testing
 
-### 1. Clonar el repositorio
+The module includes unit assertion tests to verify that both classical pupilometry and cognitive attention tracking function accurately before interactive deployment:
+
 ```bash
-git clone https://github.com/Eddyfals0/Eyestim.git
-cd Eyestim
+# Run classical pupilometry unit tests
+python src/pupilometry.py
+
+# Run attention tracking unit tests
+python src/attention.py
 ```
 
-### 2. Instalar dependencias
-```bash
-pip install torch torchvision Pillow matplotlib opencv-python numpy
-```
-
-### 3. Generar datos sintéticos (si no tienes imágenes reales)
-```bash
-cd reconocimiento_ojos
-python src/generate_synthetic_data.py
-```
-
-### 4. Entrenar el modelo
-```bash
-python src/train.py
-```
-
-### 5. Probar con imágenes estáticas
-```bash
-python src/predict.py ruta/a/tu/imagen.jpg
-```
-
-### 6. Abrir la cámara en tiempo real
-```bash
-cd ..
-python reconocimiento_ojos_testing/src/detector_camara.py
-```
-> Presiona **Q** para salir | **S** para guardar una captura
+*Both commands will output success (`All unit tests passed!`) if the mathematical calculations of calibration, quadrant mapping, and ellipse fitting match the expected values.*
 
 ---
 
-## 🛠️ Tecnologías
+## 💻 Interactive Real-Time Demo
 
-| Tecnología | Uso |
-|------------|-----|
-| **PyTorch** | Arquitectura CNN, entrenamiento y predicción |
-| **OpenCV** | Acceso a cámara, Haar Cascades, procesamiento de video |
-| **Pillow** | Carga y manipulación de imágenes estáticas |
-| **Matplotlib** | Visualización de resultados y gráficas |
-| **Tkinter** | Interfaz gráfica para validación humana (RLHF) |
+Start the webcam in real-time with the **HUD interactive viewer**:
+```bash
+python src/show_eyes.py
+```
 
----
-
-## 📚 Documentación
-
-Cada módulo tiene su propia documentación detallada:
-
-- [`reconocimiento_ojos/README.md`](reconocimiento_ojos/README.md) — Arquitectura del modelo, guía de uso y explicación técnica
-- [`reconocimiento_ojos/docs/REPORTE_TECNICO.md`](reconocimiento_ojos/docs/REPORTE_TECNICO.md) — Reporte profundo de cada script y su lógica interna
-- [`reconocimiento_ojos_testing/README.md`](reconocimiento_ojos_testing/README.md) — Pipeline de cámara en tiempo real paso a paso
+### Viewer Controls:
+*   **[ Attention Progress Bar ]**: Dynamic progress bar at the top of the screen that changes colors (cyan/green/yellow/red) based on your attention score.
+*   **[ Gaze Vector ]**: Yellow vector pointing from the iris center to the direction of your screen focus.
+*   **[ Pupil Outline ]**: Green ellipse contouring your pupil in real-time along with its diameter in pixels.
+*   **[ Key 'q' ]**: Safely exits the interactive demo and triggers the reporter module to generate the session report.
 
 ---
 
-## 📄 Licencia
+## 📊 Session Statistical Report
 
-Proyecto académico universitario desarrollado con fines educativos.
+Upon pressing `q` to exit the webcam view, `src/reporter.py` automatically compiles a complete report in `docs/`:
+
+*   **[docs/session_report.md](file:///c:/Users/Eduar/AREA_PROGRAMCION/01_PROYECTOS/Eyestim/docs/session_report.md)**: Detailed Markdown report with average attention, average pupil diameter, and screen quadrant time distribution.
+*   **[docs/attention_evolution.png](file:///c:/Users/Eduar/AREA_PROGRAMCION/01_PROYECTOS/Eyestim/docs/attention_evolution.png)**: Dual-panel plot displaying temporal pupil diameter changes against the baseline (top) and attention score dynamics (bottom).
+
+---
+
+## 🎓 Academic Research Paper (LaTeX / PDF)
+
+For scientific documentation and social service validation, a full **5-page** research paper was written and formatted in two columns under the standard academic layout.
+
+The pre-compiled PDF featuring native TikZ vector diagrams of the CNN blocks can be accessed here:
+👉 **[paper_eyestim.pdf](file:///c:/Users/Eduar/AREA_PROGRAMCION/01_PROYECTOS/Eyestim/docs/paper_eyestim.pdf)**

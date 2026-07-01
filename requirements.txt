@@ -1,6 +1,7 @@
 torch
 torchvision
-Pillow
-matplotlib
 opencv-python
 numpy
+pillow
+matplotlib
+requests
