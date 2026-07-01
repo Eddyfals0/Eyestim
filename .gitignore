@@ -19,3 +19,14 @@ ENV/
 # Windows
 desktop.ini
 Thumbs.db
+
+# Datos locales y pesos del modelo
+data/
+models/
+capturas/
+
+# Archivos de agente, especificacion y especificaciones del proyecto
+specs/
+.agents/
+.specify/
+
