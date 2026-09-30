@@ -1,0 +1,109 @@
+{
+  "eyedentify_integrity": {
+    "rows": 9425,
+    "participants": 51,
+    "sessions": 2533,
+    "missing_columns": [],
+    "missing_images": 0,
+    "unreadable_images": 0,
+    "duplicate_image_paths": 0,
+    "non_finite_targets": 0,
+    "target_outside_physiological_range_1_to_9_mm": 0,
+    "image_shapes": [
+      [
+        16,
+        32,
+        3
+      ]
+    ],
+    "participant_overlaps": {
+      "train_validation": [],
+      "train_test": [],
+      "validation_test": []
+    },
+    "split_summary": {
+      "train": {
+        "frames": 6734,
+        "participants": 36,
+        "target_mean_mm": 2.383616992376992,
+        "target_std_mm": 0.29760590171297974
+      },
+      "validation": {
+        "frames": 1411,
+        "participants": 8,
+        "target_mean_mm": 2.426095956177652,
+        "target_std_mm": 0.3139837249725762
+      },
+      "test": {
+        "frames": 1280,
+        "participants": 7,
+        "target_mean_mm": 2.3648101098958336,
+        "target_std_mm": 0.25930750629083826
+      }
+    },
+    "passed": true
+  },
+  "diameter_participant_level_comparison": {
+    "test_participants": 7,
+    "participants_where_model_beats_baseline": 6,
+    "paired_wilcoxon_two_sided_p": 0.296875,
+    "model_subject_mean_mae_mm": 0.2029634857133458,
+    "baseline_subject_mean_mae_mm": 0.22272919864415827
+  },
+  "cambridge_end_to_end_held_out": {
+    "n": 150,
+    "detection_rate": 1.0,
+    "cnn_center_mae_px": 5.707699577609698,
+    "ellipse_center_mae_px": 1.7642661390904577,
+    "diameter_mae_px": 0.8755611228942871,
+    "diameter_median_ae_px": 0.7255293726921082,
+    "diameter_p95_ae_px": 2.1310477137565598,
+    "diameter_bias_px": -0.6812706152598064,
+    "diameter_spearman": 0.7845090518102134,
+    "crop_size": 32,
+    "threshold_offset": 35
+  },
+  "reporter_benchmark": {
+    "frames": 600,
+    "generation_seconds": 0.5352003000443801,
+    "report_exists": true,
+    "graph_exists": true,
+    "report_path": "docs\\training\\session_example\\session_report.md",
+    "graph_path": "docs\\training\\session_example\\attention_evolution.png"
+  },
+  "artifacts": {
+    "dashboard": "docs/training/project_dashboard.png",
+    "center_model": {
+      "path": "src/models/eyestim_cnn.pth",
+      "bytes": 2202192,
+      "sha256": "d509717eb822162a1d2ec2faf7b99a0830e899d458a7ac7c9925388447a787ad"
+    },
+    "center_training_checkpoint": {
+      "path": "src/models/eyestim_center_checkpoint.pth",
+      "bytes": 6602262,
+      "sha256": "ccf07cf43ce58c341bcfa4356bc6c0669533673dc53b00bd2cbf98451ba5726d"
+    },
+    "diameter_best_checkpoint": {
+      "path": "src/models/eyestim_diameter.pth",
+      "bytes": 2166089,
+      "sha256": "739fa1e609a2de590a15706de7d27b22ad1c548ad07fbc0073df053c06985b47"
+    },
+    "diameter_last_checkpoint": {
+      "path": "src/models/eyestim_diameter_last.pth",
+      "bytes": 2166707,
+      "sha256": "76af4f31049a03ff474db26f37d49acd6af7c31dc932e363a6bc132ed6b0f2bc"
+    },
+    "diameter_periodic_checkpoints": [
+      {
+        "path": "src/models/checkpoints/diameter_epoch_010.pth",
+        "bytes": 2166349,
+        "sha256": "8b7032d32db09f8a23119c509642ea207de6c8408fae8fd875b494d6ced7a858"
+      },
+      {
+        "path": "src/models/checkpoints/diameter_epoch_020.pth",
+        "bytes": 2166349,
+        "sha256": "3c3eb1415e61bded42346245c4f1af60ebffca4bf6149023f97b68be4fa9a290"
+      }
+    ]
+  }
+}

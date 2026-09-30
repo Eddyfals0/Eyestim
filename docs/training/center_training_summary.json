@@ -1,0 +1,48 @@
+{
+  "dataset": "Labelled Pupils in the Wild",
+  "license": "CC BY-NC-SA 4.0",
+  "splits": {
+    "train_participants": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "validation_participants": [
+      7
+    ],
+    "test_participants": [
+      8
+    ],
+    "samples": {
+      "train": 12000,
+      "validation": 2000,
+      "test": 2000
+    }
+  },
+  "best_epoch": 12,
+  "training_seconds": 392.4320492744446,
+  "cpu_inference_ms_per_eye": 1.6811752000357956,
+  "legacy_bioid_model": {
+    "samples": 2000,
+    "mean_error_px": 10.374273300170898,
+    "median_error_px": 10.560446739196777,
+    "p95_error_px": 16.257034301757812,
+    "within_3px": 0.037,
+    "within_5px": 0.078,
+    "prediction_std_x": 3.3881317890172014e-21,
+    "prediction_std_y": 8.131516293641283e-20
+  },
+  "lpw_model": {
+    "samples": 2000,
+    "mean_error_px": 4.444945335388184,
+    "median_error_px": 4.243725299835205,
+    "p95_error_px": 8.823871612548828,
+    "within_3px": 0.313,
+    "within_5px": 0.6265,
+    "prediction_std_x": 0.1878265142440796,
+    "prediction_std_y": 0.0882253646850586
+  }
+}

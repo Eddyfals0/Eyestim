@@ -4,7 +4,10 @@ import config
 class AttentionTracker:
     """
     Gestiona la calibración de la línea base pupilar, clasifica espacialmente la mirada 
-    a regiones y evalúa el porcentaje dinámico de atención.
+    a regiones y calcula un índice heurístico de estabilidad ocular.
+
+    El nombre de la clase se conserva por compatibilidad. La validación BBBD/NEMAR
+    demostró que el índice no debe interpretarse como atención cognitiva.
     """
     def __init__(self, calibration_window: int = config.CALIBRATION_WINDOW, gaze_window: int = config.GAZE_WINDOW):
         self.calibration_window = calibration_window
@@ -54,8 +57,8 @@ class AttentionTracker:
 
     def calculate_attention(self, current_diameter: float, nx: float, ny: float) -> float:
         """
-        Calcula el score de atención cognitiva (0% - 100%) combinando la
-        estabilidad de la mirada y los cambios relativos en el diámetro.
+        Calcula el índice ocular experimental (0–100) combinando estabilidad
+        espacial y cambios relativos en el diámetro.
         """
         # Registrar mirada en la ventana móvil
         self.gaze_history_x.append(nx)
@@ -65,7 +68,7 @@ class AttentionTracker:
             self.gaze_history_x.pop(0)
             self.gaze_history_y.pop(0)
             
-        # 1. Parpadeo u ojo cerrado -> Atención cae a 0 inmediatamente
+        # 1. Parpadeo/ojo cerrado: ausencia de señal válida
         if current_diameter <= 0.0:
             return 0.0
             
@@ -80,25 +83,25 @@ class AttentionTracker:
         else:
             stability = 0.5  # Valor por defecto inicial mientras se llena la ventana móvil
             
-        # 3. Evaluar dilatación cognitiva respecto a la línea base
+        # 3. Evaluar el cambio pupilar respecto a la línea base
         pupil_factor = 1.0
         if self.is_calibrated and self.baseline_diameter > 0.0:
             dilation_ratio = current_diameter / self.baseline_diameter
             
-            # Dilatación cognitiva leve (esfuerzo de atención/procesamiento mental)
+            # Rango heurístico heredado; no equivale a esfuerzo cognitivo validado
             if 1.02 <= dilation_ratio <= 1.20:
                 pupil_factor = 1.15
             # Contracción extrema o dilatación por luz/ruido físico
             elif dilation_ratio < 0.85 or dilation_ratio > 1.30:
                 pupil_factor = 0.80
                 
-        # 4. Score final compuesto de atención
+        # 4. Índice heurístico compuesto
         score = stability * pupil_factor * 100.0
         return float(np.clip(score, 0.0, 100.0))
 
 if __name__ == "__main__":
     # Test unitario autónomo
-    print("=== Test Unitario Autónomo del Analizador de Atención ===")
+    print("=== Test Unitario Autónomo del Índice Ocular ===")
     tracker = AttentionTracker(calibration_window=10, gaze_window=5)
     
     # 1. Test de clasificación de zonas
@@ -118,7 +121,7 @@ if __name__ == "__main__":
     assert tracker.is_calibrated, "Error: Debería haberse calibrado."
     assert abs(tracker.baseline_diameter - 10.0) < 0.5, "Error: Línea base incorrecta."
     
-    # 3. Test de atención
+    # 3. Test matemático del índice (no valida el constructo de atención)
     # Caso 1: Mirada fija (estabilidad alta) y pupila normal
     for _ in range(5):
         score_fijo = tracker.calculate_attention(10.0, 0.1, 0.1)
@@ -132,4 +135,4 @@ if __name__ == "__main__":
     print(f"Score mirada errática: {score_erratico:.2f}% (Esperado: < 40%)")
     assert score_erratico < 40.0
     
-    print("Módulo de análisis de atención verificado correctamente.")
+    print("Cálculo heurístico del índice ocular verificado correctamente.")

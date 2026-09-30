@@ -30,3 +30,11 @@ specs/
 .agents/
 .specify/
 
+# Archivos temporales y compilación
+tmp/
+*.aux
+*.log
+*.out
+*.synctex.gz
+
+

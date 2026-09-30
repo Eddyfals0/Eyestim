@@ -47,6 +47,46 @@ class EyePupilCNN(nn.Module):
         x = self.tanh(self.fc2(x))
         return x
 
+
+class PupilDiameterCNN(nn.Module):
+    """Regresor compacto de diámetro pupilar en milímetros.
+
+    La red recibe una ROI de color de ojo de proporción 2:1. El valor de
+    salida está normalizado con la media y desviación del conjunto de
+    entrenamiento; el checkpoint guarda esos parámetros para inferencia.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 16, kernel_size=3, padding=1),
+            nn.BatchNorm2d(16),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2),
+            nn.Conv2d(16, 32, kernel_size=3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2),
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2),
+            nn.Conv2d(64, 96, kernel_size=3, padding=1),
+            nn.BatchNorm2d(96),
+            nn.ReLU(inplace=True),
+        )
+        self.pool = nn.AdaptiveAvgPool2d((2, 4))
+        self.regressor = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(96 * 2 * 4, 128),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.25),
+            nn.Linear(128, 1),
+        )
+
+    def forward(self, x):
+        return self.regressor(self.pool(self.features(x))).squeeze(1)
+
 if __name__ == "__main__":
     # Test unitario básico del modelo
     model = EyePupilCNN()

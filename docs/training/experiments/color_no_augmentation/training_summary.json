@@ -1,0 +1,71 @@
+{
+  "dataset": "EyeDentify",
+  "license": "CC BY-NC 4.0",
+  "split_participants": {
+    "train": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "validation": [
+      15,
+      16,
+      17
+    ],
+    "test": [
+      18,
+      19,
+      20
+    ]
+  },
+  "split_samples": {
+    "train": 2630,
+    "validation": 536,
+    "test": 592
+  },
+  "target_train_mean_mm": 2.4962358474731445,
+  "target_train_std_mm": 0.2796173393726349,
+  "best_epoch": 13,
+  "stopped_epoch": 25,
+  "training_seconds": 60.60571646690369,
+  "model_parameters": 177953,
+  "cpu_inference_ms_per_eye": 0.7022616001777351,
+  "cpu_inference_fps_single_eye": 1423.9707820375063,
+  "test": {
+    "samples": 592,
+    "mae_mm": 0.23821925009424622,
+    "median_ae_mm": 0.2132420539855957,
+    "rmse_mm": 0.2882197205154056,
+    "p95_ae_mm": 0.506457495689392,
+    "bias_mm": 0.14056042823437098,
+    "r2": -0.2578057850727078,
+    "pearson_r": 0.2945813027292138,
+    "spearman_r": 0.19418736496145525,
+    "within_0_25_mm": 0.5625,
+    "within_0_50_mm": 0.9459459459459459
+  },
+  "constant_train_mean_baseline": {
+    "samples": 592,
+    "mae_mm": 0.24163108882871834,
+    "median_ae_mm": 0.2426067590713501,
+    "rmse_mm": 0.2729293691901469,
+    "p95_ae_mm": 0.4490845322608947,
+    "bias_mm": 0.09190416396469683,
+    "r2": -0.12788999778974253,
+    "pearson_r": NaN,
+    "spearman_r": 0.420446955459924,
+    "within_0_25_mm": 0.5152027027027027,
+    "within_0_50_mm": 0.981418918918919
+  }
+}

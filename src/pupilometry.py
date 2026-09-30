@@ -49,7 +49,9 @@ def estimate_pupil_diameter(eye_roi: np.ndarray, predicted_center_norm: tuple[fl
     min_val, _, _, _ = cv2.minMaxLoc(blur)
     
     # 5. Umbral local dinámico (binarización) centrado en el color de la pupila
-    threshold_value = min(255, max(0, int(min_val + 15)))
+    threshold_value = min(
+        255, max(0, int(min_val + config.PUPIL_THRESHOLD_OFFSET))
+    )
     _, thresh = cv2.threshold(blur, threshold_value, 255, cv2.THRESH_BINARY_INV)
     
     # 6. Limpieza morfológica para rellenar huecos

@@ -13,6 +13,7 @@ class SessionReporter:
         self.output_dir = output_dir
         self.timestamps = []
         self.pupil_diameters = []
+        self.learned_diameters_mm = []
         self.gaze_coords_x = []
         self.gaze_coords_y = []
         self.attention_scores = []
@@ -20,12 +21,21 @@ class SessionReporter:
         
         os.makedirs(self.output_dir, exist_ok=True)
 
-    def log_frame(self, diameter: float, nx: float, ny: float, attention: float, zone: str) -> None:
+    def log_frame(
+        self,
+        diameter: float,
+        nx: float,
+        ny: float,
+        attention: float,
+        zone: str,
+        diameter_mm: float = 0.0,
+    ) -> None:
         """
         Registra un fotograma de la sesión.
         """
         self.timestamps.append(time.time())
         self.pupil_diameters.append(diameter)
+        self.learned_diameters_mm.append(diameter_mm)
         self.gaze_coords_x.append(nx)
         self.gaze_coords_y.append(ny)
         self.attention_scores.append(attention)
@@ -50,6 +60,8 @@ class SessionReporter:
         avg_attention = np.mean(self.attention_scores)
         valid_diameters = [d for d in self.pupil_diameters if d > 0.0]
         avg_diameter = np.mean(valid_diameters) if valid_diameters else 0.0
+        valid_diameters_mm = [d for d in self.learned_diameters_mm if d > 0.0]
+        avg_diameter_mm = np.mean(valid_diameters_mm) if valid_diameters_mm else 0.0
         
         # 2. Calcular estadísticas por zona
         zones, counts = np.unique(self.active_zones, return_counts=True)
@@ -61,22 +73,38 @@ class SessionReporter:
         # 3. Generar gráficos temporales con Matplotlib
         rel_time = np.array(self.timestamps) - self.timestamps[0]
         
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+        panel_count = 3 if valid_diameters_mm else 2
+        fig, axes = plt.subplots(panel_count, 1, figsize=(10, 10), sharex=True)
+        ax1 = axes[0]
+        ax2 = axes[-1]
         
         # Subplot 1: Evolución del diámetro de la pupila
         ax1.plot(rel_time, self.pupil_diameters, color="blue", linewidth=1.5, label="Diámetro actual")
         if baseline_diameter > 0.0:
             ax1.axhline(y=baseline_diameter, color="red", linestyle="--", label=f"Línea base ({baseline_diameter:.1f} px)")
         ax1.set_ylabel("Diámetro Pupilar (píxeles)")
-        ax1.set_title("Evolución de la Dilatación Pupilar y Atención del Usuario")
+        ax1.set_title("Evolución de la pupilometría y del índice ocular")
         ax1.legend(loc="upper right")
         ax1.grid(True)
+
+        if valid_diameters_mm:
+            ax_mm = axes[1]
+            ax_mm.plot(
+                rel_time,
+                self.learned_diameters_mm,
+                color="#7c3aed",
+                linewidth=1.5,
+                label="CNN EyeDentify",
+            )
+            ax_mm.set_ylabel("Diámetro estimado (mm)")
+            ax_mm.legend(loc="upper right")
+            ax_mm.grid(True)
         
-        # Subplot 2: Evolución de la atención
-        ax2.plot(rel_time, self.attention_scores, color="green", linewidth=1.5, label="Porcentaje de atención")
-        ax2.axhline(y=70, color="orange", linestyle=":", label="Umbral de alta concentración (70%)")
+        # Subplot 2: evolución del índice ocular (no atención cognitiva validada)
+        ax2.plot(rel_time, self.attention_scores, color="green", linewidth=1.5, label="Índice ocular experimental")
+        ax2.axhline(y=70, color="orange", linestyle=":", label="Referencia heurística (70)")
         ax2.set_xlabel("Tiempo transcurrido (segundos)")
-        ax2.set_ylabel("Porcentaje de Atención (%)")
+        ax2.set_ylabel("Índice ocular (0–100)")
         ax2.set_ylim(-5, 105)
         ax2.legend(loc="upper right")
         ax2.grid(True)
@@ -96,20 +124,21 @@ class SessionReporter:
             table_rows.append(f"| **{zone_name}** | {count_frames} | {pct:.2f}% |")
         table_content = "\n".join(table_rows)
         
-        markdown_content = f"""# Reporte Analítico de Atención y Pupilometría
+        markdown_content = f"""# Reporte Analítico Experimental de Pupilometría
 **Fecha de Análisis**: {time.strftime('%Y-%m-%d %H:%M:%S')}
 **Duración de la Sesión**: {duration_sec:.2f} segundos
 **Muestras totales (Fotogramas)**: {total_frames}
 
 ## Resumen Ejecutivo
 
-- **Porcentaje de Atención Promedio**: {avg_attention:.2f}%
+- **Índice Ocular Experimental Promedio**: {avg_attention:.2f}/100
 - **Diámetro Pupilar Promedio**: {avg_diameter:.2f} píxeles
+- **Diámetro CNN EyeDentify Promedio**: {avg_diameter_mm:.2f} mm
 - **Línea Base del Sujeto**: {baseline_diameter:.2f} píxeles (calibrada)
 
 ---
 
-## Distribución de Atención por Zonas
+## Distribución de Mirada Heurística por Zonas
 
 La siguiente tabla detalla la cantidad de fotogramas y el porcentaje de tiempo que el usuario permaneció enfocado en cada región de la pantalla:
 
@@ -121,17 +150,18 @@ La siguiente tabla detalla la cantidad de fotogramas y el porcentaje de tiempo q
 
 ## Gráficos de Evolución Temporal
 
-La evolución en tiempo real de las variables cognitivas y fisiológicas registradas durante la sesión se detalla a continuación:
+La evolución temporal de las variables oculares registradas durante la sesión se detalla a continuación:
 
-![Evolución Temporal de la Atención](attention_evolution.png)
+![Evolución temporal de las señales oculares](attention_evolution.png)
 
 ---
 
-## Notas de Interpretación Fisiológica
+## Límites de interpretación
 
-1. **Dilatación Cognitiva**: Variaciones positivas en el diámetro de la pupila por encima de la línea base calibrada ({baseline_diameter:.1f} px), sin cambios en la iluminación ambiental, indican un incremento de la carga cognitiva o atención concentrada del sujeto.
-2. **Estabilidad de la Mirada**: Una varianza baja en la zona de enfoque se correlaciona con periodos de lectura fija o atención sostenida, empujando al alza el porcentaje de atención calculado.
-3. **Parpadeos**: Los valles de caída a 0% de atención representan parpadeos o oclusiones momentáneas del rostro del usuario, lo cual es normal y saludable durante la visualización prolongada.
+1. El valor 0–100 es un **índice heurístico de estabilidad ocular**, no una probabilidad ni una medición clínica/cognitiva de atención.
+2. El diámetro CNN en milímetros se entrenó con EyeDentify y referencia Tobii, pero requiere calibración local antes de usarse como medición física del dispositivo actual.
+3. Luminancia, distancia a cámara, postura, iris, gafas, fatiga y activación autonómica pueden modificar las señales.
+4. Los ceros representan ausencia de una detección válida y pueden incluir parpadeos u oclusiones.
 """
         with open(report_path, "w", encoding="utf-8") as f:
             f.write(markdown_content)

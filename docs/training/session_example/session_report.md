@@ -1,14 +1,14 @@
 # Reporte Analítico Experimental de Pupilometría
-**Fecha de Análisis**: 2026-09-30 10:10:26
-**Duración de la Sesión**: 131.03 segundos
-**Muestras totales (Fotogramas)**: 3508
+**Fecha de Análisis**: 2026-09-09 19:02:07
+**Duración de la Sesión**: 19.97 segundos
+**Muestras totales (Fotogramas)**: 600
 
 ## Resumen Ejecutivo
 
-- **Índice Ocular Experimental Promedio**: 0.30/100
-- **Diámetro Pupilar Promedio**: 20.98 píxeles
-- **Diámetro CNN EyeDentify Promedio**: 2.25 mm
-- **Línea Base del Sujeto**: 0.00 píxeles (calibrada)
+- **Índice Ocular Experimental Promedio**: 77.73/100
+- **Diámetro Pupilar Promedio**: 11.51 píxeles
+- **Diámetro CNN EyeDentify Promedio**: 3.10 mm
+- **Línea Base del Sujeto**: 11.50 píxeles (calibrada)
 
 ---
 
@@ -18,11 +18,11 @@ La siguiente tabla detalla la cantidad de fotogramas y el porcentaje de tiempo q
 
 | Zona de Enfoque | Fotogramas (Muestras) | Porcentaje de Permanencia |
 | :--- | :---: | :---: |
-| **Centro** | 3508 | 100.00% |
+| **Centro** | 540 | 90.00% |
 | **Arriba** | 0 | 0.00% |
 | **Abajo** | 0 | 0.00% |
 | **Izquierda** | 0 | 0.00% |
-| **Derecha** | 0 | 0.00% |
+| **Derecha** | 60 | 10.00% |
 
 ---
 
